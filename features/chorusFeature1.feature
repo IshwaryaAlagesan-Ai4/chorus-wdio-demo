@@ -23,10 +23,11 @@ Feature: SS&C E2E Feature Testing
     And I click view Chorus Results
 
   @fillform1 @step4
-  Scenario: User click Create Link Folder form
+  Scenario: User click Create Link Folder form and Upload File
     Given I Open the first case from the worklist
     When I click create Link Folder
     And I click Send for Referral
+    Then I upload a File in Underwriting screen
 
   @fillform1 @step5
   Scenario: User click Proceed and fill benefits
@@ -42,10 +43,12 @@ Feature: SS&C E2E Feature Testing
     Given I Open the first case from the worklist
     When I select keep me as owner and continue to next step
     Then I click view data and verify the status is "TOASSESS"
+    
 
   @fillform1 @step7
   Scenario: User click send email, verify the details and submit
     Given I Open the first case from the worklist
+    When I click view data and capture "Case Reference" details
     When I click Send Email button and chk Email window opens
     # Then I verify the below details in the Email window
     #   |josaeph4.barbara12@outlook.com|test tester|

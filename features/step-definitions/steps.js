@@ -3,6 +3,9 @@ import { expect, $, browser } from '@wdio/globals';
 // import allure from 'allure-commandline';
 // const allureReporter = require('@wdio/allure-reporter').default;
 import allureReporter from '@wdio/allure-reporter'
+import path from 'node:path'
+
+var GB_AccountNumber;
 
 Given(/^I login to the SSC Portal$/, async () => {
     // await browser.setWindowSize(1365, 945)
@@ -24,6 +27,7 @@ When('I create a {string} worklist', async (businessAreaDropdown) => {
     await $("//div[@class='ui-card-main-text'][normalize-space()='Create']").waitForDisplayed(3000);
     await $("//app-create-work//select[contains(@id,'work-businessArea')]").selectByVisibleText(businessAreaDropdown)
     await $("//app-create-work//select[contains(@id,'work-status')]").selectByVisibleText("TOCREATE")
+    await saveCurrentPageScreenshot();
     await $("//app-create-work[@createworkresource='CRTWORK']//button[@type='submit'][normalize-space()='Create']").click();
     await $("//span[@class='p-accordion-header-text'][contains(text(),'Created Items')]").waitForDisplayed(3000);
     await $("//div[@class='ui-card focused-card']//button//svg-icon[contains(@src,'close')]").click();
@@ -37,9 +41,13 @@ When('I Open the first case from the worklist', async () => {
     if(caseOpenedState!=true)
     {
         // ------Open the first item: by double click
+        await browser.pause(2000);
+
         await $("//button[normalize-space()='Refresh']").click();
+        await saveCurrentPageScreenshot();
         await $("//div[@class='awd-item selected default-size']//span[@class='awd-ba-type-data'][normalize-space()='PACLIFE - UNDERWRITE']/..").doubleClick();
         // await $("//div[@class='awd-item selected default-size']//span[@class='awd-ba-type-data'][normalize-space()='PACLIFE - UNDERWRITE']/..").click();
+        
     }
 })
 
@@ -47,12 +55,14 @@ When('I select Owner as Yes and continue without client list', async()=>{
     // ------Owner-Page-Filling
     await $("//div[@class='ui-card focused-card']//div[contains(text(),'PACLIFE - UNDERWRITE')]").waitForDisplayed(5000);
     await $("//input[@value='Yes']").click();
+    await saveCurrentPageScreenshot();
     // await $("//select[@name='response']").selectByVisibleText("Yes - Keep me as owner")
     await $("//button[contains(text(),'Next')]").click();
 
     // ------Continue without client list
     await $("//input[@value='Continue without client list']").waitForDisplayed()
     await $("//input[@value='Continue without client list']").click();
+    await saveCurrentPageScreenshot();
     await $("//button[contains(text(),'Next')]").click();
     await $("//h2[contains(text(),'Underwriting Create Case')]").waitForDisplayed();
 })
@@ -76,6 +86,7 @@ When('I fill the Underwriting Create case details', async()=>{
     await $("//input[@awdname='OCCU']").setValue("Chef")
     await $("//select[@awdname='LIFE']").selectByVisibleText("Single")
     await $("//input[@awdname='CRCK']").click()
+     await saveCurrentPageScreenshot();
     await $("//button[@name='Save']").click()
     await $("//span[@class='ui-dialog-title'][text()='Notice']").waitForDisplayed(2000);
     await $("//button[normalize-space()='Continue']").click();
@@ -112,6 +123,7 @@ When('I click create Link Folder', async()=>{
     await $("//button[@name='fLinkFolder']").waitForDisplayed()
     await $("//button[@name='fLinkFolder']").click();
     await $("//h3[normalize-space()='Reason for creating Link Folder?']").waitForDisplayed(5000);
+    await saveCurrentPageScreenshot();
     await $("//button[contains(text(),'Back')]").click();
     // await $("//h3[normalize-space()='Reason for creating Link Folder?']").waitForDisplayed({reverse: true});
     await $("//button[@name='fLinkFolder']").waitForDisplayed()
@@ -122,9 +134,20 @@ When('I click Send for Referral', async()=>{
     await $("//button[@name='referral']").waitForDisplayed(5000);
     await $("//button[@name='referral']").click();
     await $("//h2[normalize-space()='Select Referral Team']").waitForDisplayed(3000);
+    await saveCurrentPageScreenshot();    await saveCurrentPageScreenshot();
     await $("//button[@name='Back']").click();
     await $("//button[@name='referral']").waitForDisplayed();
 
+})
+
+When('I upload a File in Underwriting screen', async()=>{
+    await $("//button[@name='fileUploader']").click();
+    await $("//h2[normalize-space()='Create & Link Attachment']").waitForDisplayed();
+    await $("//select[@id='sourceBusAreaInput-']").selectByVisibleText("PACLIFE")
+    await $("//select[@id='sourceFileTypeInput-']").selectByVisibleText("EMAILOUT")
+    const filePath = 'DrivingLicense.pdf';
+    const remoteFilePath = await browser.uploadFile(filePath);
+    await browser.$("#fileBrowse-").setValue(remoteFilePath);
 })
 
 When('I proceed and fill treaty details', async()=>{
@@ -140,6 +163,7 @@ When('I proceed and fill treaty details', async()=>{
     await $("//select[@name='DDIS']").selectByVisibleText("Any");
     await $("//button[@name='fAdd']").click();
     await $("//td//div[contains(text(),'Treaty 1')]").waitForDisplayed(5000);
+    await saveCurrentPageScreenshot();
     await $("//button[@name='NextStep']").click();
     // await $("//button[normalize-space()='Proceed']").click();
     await $("//legend[normalize-space()='Sum Reinsurance - Current Application']").waitForDisplayed(5000);
@@ -161,6 +185,7 @@ When('I verify the treaty details in the ReInsurance Calculation', async(dataTab
         index++;
     }
     await browser.pause(1000);
+    await saveCurrentPageScreenshot();
     await $("//button[@name='NextStep']").click();
     await $("//h2[normalize-space()='Limit Check Alerts']").waitForDisplayed(5000);
 })
@@ -168,16 +193,20 @@ When('I verify the treaty details in the ReInsurance Calculation', async(dataTab
 When('I proceed to Review case creation page and finish it', async()=>{
     await $("//button[@name='NextStep']").click();
     await $("//h3[normalize-space()='Review Case Creation']").waitForDisplayed();
+    await saveCurrentPageScreenshot();
     await $("//button[contains(text(),'Next')]").click();
     await browser.pause(2000);
+    await saveCurrentPageScreenshot();
     // await $("//button[contains(text(),'Next')]").waitForDisplayed({reverse: true});
 })
 
 When('I select keep me as owner and continue to next step', async()=>{
     await $("//h3[contains(text(),'You are the current owner of this case')]").waitForDisplayed(5000);
     await $("//select[@name='response']").selectByVisibleText("Yes - Keep me as owner");
+    await saveCurrentPageScreenshot();
     await $("//button[contains(text(),'Next')]").click();
     await $("//h2[normalize-space()='Underwriting Assessment Form']").waitForDisplayed(2000);
+    await saveCurrentPageScreenshot();
 
 
 })
@@ -188,28 +217,56 @@ When('I click view data and verify the status is {string}', async(verifyText)=>{
     await $("//li//span[normalize-space()='View Data']").click();
     await $("//th[normalize-space()='Data Dictionary Name']").waitForDisplayed();
     await expect($("//td[normalize-space()='Status Code']/../td[3]")).toHaveText(verifyText);
+    await saveCurrentPageScreenshot();
     await $("//app-view-data[@class='ng-star-inserted']//button[3]").click()
     await $("//th[normalize-space()='Data Dictionary Name']").waitForDisplayed({ reverse: true });
 
+})
 
+When('I click view data and capture {string} details', async(referenceTextField)=>{
+    await $("//div[@class='ui-card focused-card']//div[@class='ui-card-header']//button[@class='icon-btn']").click()
+    await $("//li//span[normalize-space()='View Data']").click();
+    await $("//th[normalize-space()='Data Dictionary Name']").waitForDisplayed();
+    GB_AccountNumber = await $("//td[normalize-space()='"+referenceTextField+"']/../td[3]").getText();
+    await saveCurrentPageScreenshot();
+    await $("//app-view-data[@class='ng-star-inserted']//button[3]").click()
+    await $("//th[normalize-space()='Data Dictionary Name']").waitForDisplayed({ reverse: true });
+})
+
+When('test', async()=>{
+    //button[normalize-space()='Proceed']
 })
 
 When('I click Send Email button and chk Email window opens', async()=>{
     
     // Click Email Button
     // await $("//div[@class='ui-accordion-content']").waitForDisplayed();
-    
+    await $("//button[@name='fComposeEmail']").waitForDisplayed()
+    await $("//button[@name='fComposeEmail']").click();
+    await $("//div[@class='ui-accordion-content']").waitForDisplayed();
+    await $("//div[contains(text(),'PACLIFE - UNDERWRITE')]").moveTo();
+    await saveCurrentPageScreenshot();
     await browser.switchFrame($("//iframe[@seamless='seamless']"));
     await expect($("//input[@id='toAddressList']")).toHaveValue("josaeph4.barbara12@outlook.com");
-    await expect($("//input[@id='subjectLine']")).toHaveValue("Your Ref: Test, Case Ref: 25096131941");
+    await expect($("//input[@id='subjectLine']")).toHaveValue("Your Ref: Test, Case Ref: "+GB_AccountNumber);
     await browser.switchFrame($("//iframe['#emailbody_ifr']"));
     await expect($("//p[normalize-space()='test tester']")).toBeExisting();
 
     await browser.switchToParentFrame()
-    await browser.debug();
     await $("//button[@id='send']").waitForDisplayed(2000)
-    $("//div[@id='attachmentUploader']//input[@type='file']").addValue("C:\\automation\\test.pdf.bmp")
+    await $("//button[@id='send']").click();
+    // await $("//button[@id='send']").waitForDisplayed({reverse:true})
+    await browser.pause(2000)
+    await browser.switchToParentFrame();
+    // $("//div[@id='attachmentUploader']//input[@type='file']").addValue("C:\\automation\\test.pdf.bmp")
     // browser.switchFrame($("#emailDoc"))
+    await $("//button[contains(@name,'NextStep')]").waitForDisplayed();
+    await $("//button[contains(@name,'NextStep')]").click();
+    await $("//h3[normalize-space()='Offer of terms:']").waitForDisplayed();
+    await $("//input[@value='accept']").click();
+    await saveCurrentPageScreenshot();
+    await $("//button[normalize-space()='Next']").click();
+
 })
 
 When('I proceed next steps', async () => {

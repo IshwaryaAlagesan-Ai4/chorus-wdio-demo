@@ -144,7 +144,7 @@ export const config = {
         // <boolean> invoke formatters without executing steps
         dryRun: false,
         // <boolean> abort the run on first failure
-        failFast: false,
+        failFast: true,
         // <string[]> Only execute the scenarios with name matching the expression (repeatable).
         name: [],
         // <boolean> hide step definition snippets for pending steps
