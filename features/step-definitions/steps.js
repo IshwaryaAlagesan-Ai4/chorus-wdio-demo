@@ -33,17 +33,22 @@ When('I create a {string} worklist', async (businessAreaDropdown) => {
     await $("//div[@class='ui-card focused-card']//button//svg-icon[contains(@src,'close')]").click();
 });
 
+When('I clean up old record', async()=>{
+    await $("(//button[@class='icon-btn'])[1]").waitForDisplayed();
+    await $("(//button[@class='icon-btn'])[1]").click();
+    await $("//li//span[normalize-space()='Release']").click();
+})
 
 When('I Open the first case from the worklist', async () => {
     // Check if case already opened
+    await browser.pause(1000);
     let caseOpenedState = await $("//div[contains(text(),'PACLIFE - UNDERWRITE')]").isExisting();
     console.log("------------------>",caseOpenedState)
     if(caseOpenedState!=true)
     {
         // ------Open the first item: by double click
-        await browser.pause(2000);
-
         await $("//button[normalize-space()='Refresh']").click();
+        await browser.pause(2000);
         await saveCurrentPageScreenshot();
         await $("//div[@class='awd-item selected default-size']//span[@class='awd-ba-type-data'][normalize-space()='PACLIFE - UNDERWRITE']/..").doubleClick();
         // await $("//div[@class='awd-item selected default-size']//span[@class='awd-ba-type-data'][normalize-space()='PACLIFE - UNDERWRITE']/..").click();
@@ -134,7 +139,7 @@ When('I click Send for Referral', async()=>{
     await $("//button[@name='referral']").waitForDisplayed(5000);
     await $("//button[@name='referral']").click();
     await $("//h2[normalize-space()='Select Referral Team']").waitForDisplayed(3000);
-    await saveCurrentPageScreenshot();    await saveCurrentPageScreenshot();
+    await saveCurrentPageScreenshot();
     await $("//button[@name='Back']").click();
     await $("//button[@name='referral']").waitForDisplayed();
 
@@ -148,17 +153,22 @@ When('I upload a File in Underwriting screen', async()=>{
     const filePath = 'DrivingLicense.pdf';
     const remoteFilePath = await browser.uploadFile(filePath);
     await browser.$("#fileBrowse-").setValue(remoteFilePath);
+    await browser.pause(2000);
+    await saveCurrentPageScreenshot();
+    await $("//button[normalize-space()='Create']").click();
+    await browser.pause(3000);
+    await $("//button[normalize-space()='Create']").waitForDisplayed({reverse: true})
 })
 
-When('I proceed and fill treaty details', async()=>{
+When('I proceed and fill treaty details', async(dataTable)=>{
     await $("//button[@name='NextStep']").waitForDisplayed();
     await $("//button[@name='NextStep']").click();
     await $("//legend[normalize-space()='Capture Treaty & Benefits']").waitForDisplayed();
     await $("//select[@name='fTreaty']").selectByVisibleText("Treaty 1");
-    await $("//select[@name='fDefaultBenefits']").selectByVisibleText("CI- Benefit 1");
+    await $("//select[@name='fDefaultBenefits']").selectByVisibleText(dataTable.raw()[0][0]);
     await $("//input[@awdname='TTYP'][@value='AGE']").click();
     await $("//select[@name='TERM']").selectByVisibleText("10");
-    await $("//input[@name='fSumInsured']").setValue("140000")
+    await $("//input[@name='fSumInsured']").setValue(dataTable.raw()[0][1]);
     await $("//select[@name='DPER']").selectByVisibleText("4 Weeks");
     await $("//select[@name='DDIS']").selectByVisibleText("Any");
     await $("//button[@name='fAdd']").click();
@@ -243,14 +253,22 @@ When('I click Send Email button and chk Email window opens', async()=>{
     // await $("//div[@class='ui-accordion-content']").waitForDisplayed();
     await $("//button[@name='fComposeEmail']").waitForDisplayed()
     await $("//button[@name='fComposeEmail']").click();
+    await browser.pause(2000);
     await $("//div[@class='ui-accordion-content']").waitForDisplayed();
     await $("//div[contains(text(),'PACLIFE - UNDERWRITE')]").moveTo();
     await saveCurrentPageScreenshot();
+});
+
+When('I verify the below details in the Email window and submit', async(dataTable)=>{
+
+    // console.log("--------------------->>>>>",dataTable);
+    // dataTable.raw()[0][1];
+
     await browser.switchFrame($("//iframe[@seamless='seamless']"));
-    await expect($("//input[@id='toAddressList']")).toHaveValue("josaeph4.barbara12@outlook.com");
+    await expect($("//input[@id='toAddressList']")).toHaveValue(dataTable.raw()[0][0]);
     await expect($("//input[@id='subjectLine']")).toHaveValue("Your Ref: Test, Case Ref: "+GB_AccountNumber);
     await browser.switchFrame($("//iframe['#emailbody_ifr']"));
-    await expect($("//p[normalize-space()='test tester']")).toBeExisting();
+    await expect($("//p[normalize-space()='"+dataTable.raw()[0][1]+"']")).toBeExisting();
 
     await browser.switchToParentFrame()
     await $("//button[@id='send']").waitForDisplayed(2000)
@@ -258,6 +276,10 @@ When('I click Send Email button and chk Email window opens', async()=>{
     // await $("//button[@id='send']").waitForDisplayed({reverse:true})
     await browser.pause(2000)
     await browser.switchToParentFrame();
+
+});
+
+When('I accept offer of terms and complete', async()=>{
     // $("//div[@id='attachmentUploader']//input[@type='file']").addValue("C:\\automation\\test.pdf.bmp")
     // browser.switchFrame($("#emailDoc"))
     await $("//button[contains(@name,'NextStep')]").waitForDisplayed();
@@ -266,6 +288,8 @@ When('I click Send Email button and chk Email window opens', async()=>{
     await $("//input[@value='accept']").click();
     await saveCurrentPageScreenshot();
     await $("//button[normalize-space()='Next']").click();
+    await browser.pause(2000)
+    await saveCurrentPageScreenshot();
 
 })
 
