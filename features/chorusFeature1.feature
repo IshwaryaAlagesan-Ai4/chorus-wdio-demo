@@ -1,8 +1,11 @@
-@E2E
+@E2E @Pass
 Feature: SS&C E2E Feature Testing
+# UAT
+# pre-prod
 
   Background: Login to SSC Portal
     Given I login to the SSC Portal
+
 
   @create @step1
   Scenario: User log in to SSC Portal and create a Worklist
@@ -52,7 +55,7 @@ Feature: SS&C E2E Feature Testing
     When I click view data and capture "Case Reference" details
     When I click Send Email button and chk Email window opens
     Then I verify the below details in the Email window and submit
-      | josaeph4.barbara12@outlook.com | test tester |
+      | josaeph4.barbara12@outlook.com | test tester | ishwarya.alagesan@ai4process.com|
     And I accept offer of terms and complete
 
 # @debug

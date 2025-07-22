@@ -1,4 +1,4 @@
-@TreatyFeature @E2E
+@TreatyFeature @E2E @Fail
 Feature: SS&C Validate Treaty Details
 
   Background: Login to SSC Portal

@@ -15,7 +15,7 @@ Given(/^I login to the SSC Portal$/, async () => {
     await browser.url("https://awddev.trialclient1.awdcloud.co.uk/awd/portal/login.html")
         await expect(browser).toHaveUrl("https://awddev.trialclient1.awdcloud.co.uk/awd/portal/login.html")
         await $("#user-name").setValue("AUTOTEST")
-        await $("#password").setValue("TestAutomation3!")
+        await $("#password").setValue("Automation@11")
         await $("#sign-on").click()
         await $("//div[@class='ui-card-main-text'][contains(text(),'Worklist')]").waitForDisplayed(5000);
     }
@@ -266,6 +266,7 @@ When('I verify the below details in the Email window and submit', async(dataTabl
 
     await browser.switchFrame($("//iframe[@seamless='seamless']"));
     await expect($("//input[@id='toAddressList']")).toHaveValue(dataTable.raw()[0][0]);
+    await $("//input[@id='toAddressList']").setValue(dataTable.raw()[0][2]);
     await expect($("//input[@id='subjectLine']")).toHaveValue("Your Ref: Test, Case Ref: "+GB_AccountNumber);
     await browser.switchFrame($("//iframe['#emailbody_ifr']"));
     await expect($("//p[normalize-space()='"+dataTable.raw()[0][1]+"']")).toBeExisting();
@@ -273,6 +274,7 @@ When('I verify the below details in the Email window and submit', async(dataTabl
     await browser.switchToParentFrame()
     await $("//button[@id='send']").waitForDisplayed(2000)
     await $("//button[@id='send']").click();
+    
     // await $("//button[@id='send']").waitForDisplayed({reverse:true})
     await browser.pause(2000)
     await browser.switchToParentFrame();
